@@ -9,17 +9,19 @@ find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
 
 add_executable(pp5
     pp5.cpp
-    Hero.hpp
-    Monk.hpp
-    HUD.hpp
-    Level5.hpp
-    AttackManager.hpp
-    Attacks/Fireball.hpp
-    Attacks/HandSpell.hpp
-    Attacks/Orb.hpp
-    Attacks/Dripstone.hpp
+    src/Hero.hpp
+    src/Monk.hpp
+    src/HUD.hpp
+    src/Level5.hpp
+    src/AttackManager.hpp
+    src/Animatedsprite.hpp
+    src/Attacks/Fireball.hpp
+    src/Attacks/HandSpell.hpp
+    src/Attacks/Orb.hpp
+    src/Attacks/Dripstone.hpp
 )
 
+target_include_directories(pp5 PRIVATE src)
 target_link_libraries(pp5 PRIVATE SFML::Graphics SFML::Window SFML::System)
 if (WIN32)
     add_custom_command(

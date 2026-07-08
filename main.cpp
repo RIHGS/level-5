@@ -50,7 +50,7 @@ int main()
 
     
     sf::Font font;
-    bool fontLoaded = font.openFromFile("C:/Windows/Fonts/arial.ttf");
+    bool fontLoaded = font.openFromFile("Data / Roboto - Medium.ttf");
 
     sf::Text gameOverText(font);
 

@@ -1,9 +1,13 @@
+// dripstone.h - Falling stalactite hazard
+// Dripstones are triangular obstacles that fall from the top of the screen
+// at random x positions. The manager handles spawning, movement, and cleanup.
+
 #pragma once
 
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <cstdlib>
-#include <algorithm>//useful to access some inbuilt stuff
+#include <algorithm>
 
 class Dripstone
 {

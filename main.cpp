@@ -7,6 +7,7 @@
 #include <optional>
 #include<iostream>
 #include "dripstone.h"
+#include"Monk.hpp"
 
 class Fireball
 {
@@ -17,14 +18,14 @@ public:
 
 int main()
 {
-    
+
     srand(static_cast<unsigned>(time(nullptr)));
     sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "Platform - Orb Fireball Demo");
     window.setFramerateLimit(60);
 
     sf::RectangleShape ground({ 800.f, 50.f });//ground ko lagi
     ground.setPosition({ 0.f, 550.f });
-    ground.setFillColor(sf::Color(100, 100, 100,50));
+    ground.setFillColor(sf::Color(100, 100, 100, 50));
 
     sf::RectangleShape player({ 40.f, 60.f });//rect for now(gonna make it movable character arko pali)
     player.setFillColor(sf::Color::Green);
@@ -43,16 +44,13 @@ int main()
 
     // Fireballs
     std::vector<Fireball> fireballs;
-
     float fireballSpeed = 250.f;
     float spawnTimer = 0.f;
     float spawnInterval = 0.1f;//frequency
 
     DripstoneManager dm;
-
+    Monk monk({ 600.f, 200.f });
     bool gameOver = false;
-
-    
     sf::Font font;
     bool fontLoaded = font.openFromFile("Data/Roboto-Medium.ttf");
 
@@ -65,10 +63,9 @@ int main()
         gameOverText.setFillColor(sf::Color::Red);
         gameOverText.setPosition({ 150.f, 50.f });
     }
-
     sf::Clock clock;
-     while (window.isOpen())
-      {
+    while (window.isOpen())
+    {
         float dt = clock.restart().asSeconds();
         while (const std::optional event = window.pollEvent())
         {
@@ -77,7 +74,6 @@ int main()
                 window.close();
             }
         }
-
         if (!gameOver)
         {
             sf::Vector2f pos = player.getPosition();
@@ -85,7 +81,7 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ||
                 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
             {
-                pos.x-=playerSpeed * dt;
+                pos.x -= playerSpeed * dt;
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) ||
@@ -98,13 +94,13 @@ int main()
 
             if (pos.x > 760)
                 pos.x = 760;
-            if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) ||
+            if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
                 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) &&
                 onGround)//both key support garxa
             {
                 velocityY = jumpStrength;
                 onGround = false;
-            }   
+            }
             velocityY += gravity * dt;//accelerating
             pos.y += velocityY * dt;
 
@@ -115,7 +111,6 @@ int main()
                 velocityY = 0;
                 onGround = true;
             }
-
             player.setPosition(pos);
 
             spawnTimer += dt;//fireball spawn garne
@@ -143,11 +138,11 @@ int main()
 
                 fireballs.push_back(fb);
             }
-               for (auto& fb : fireballs)//fireball movememnt
+            for (auto& fb : fireballs)//fireball movememnt
             {
                 fb.shape.move(fb.velocity * dt);
             }
-            
+
             fireballs.erase(//boundary for fireballs
                 std::remove_if(
                     fireballs.begin(),
@@ -159,16 +154,12 @@ int main()
                         return p.x < -50 ||
                             p.x > 850 ||
                             p.y < -50 ||
-                            p.y > 650;
+                            p.y > 550.f;
                     }),
                 fireballs.end());
 
             dm.update(dt);
-
-
-
-
-
+            monk.update(dt, player.getPosition());
             auto playerBounds = player.getGlobalBounds();//collision detect
 
             for (auto& fb : fireballs)
@@ -182,12 +173,16 @@ int main()
                 {
                     gameOver = true;
                 }
+                if (monk.checkCollision(playerBounds))
+                {
+                    gameOver = true;
+                }
             }
 
         }
         else
         {
-         
+
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))//RESTART
             {
                 gameOver = false;
@@ -201,9 +196,10 @@ int main()
 
                 spawnTimer = 0.f;
                 dm.reset();
+                monk.reset();
             }
         }
-       
+
 
         window.clear(sf::Color(30, 30, 40));//DRAW
 
@@ -211,6 +207,7 @@ int main()
         window.draw(orb);
         window.draw(player);
         dm.draw(window);
+        monk.draw(window);
 
         for (auto& fb : fireballs)
         {

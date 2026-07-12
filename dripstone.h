@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <cstdlib>
-#include <algorithm>
+#include <algorithm>//useful to access some inbuilt stuff
 
 class Dripstone
 {
@@ -39,7 +39,7 @@ public:
             d.shape.setPoint(1, { 40.f,0.f });
             d.shape.setPoint(2, { 20.f,70.f });
 
-            d.shape.setFillColor(sf::Color(90, 90, 90));
+            d.shape.setFillColor(sf::Color(90, 90, 90,100));
 
             float x = static_cast<float>(rand() % 760);
 
@@ -61,7 +61,7 @@ public:
                 dripstones.end(),
                 [](const Dripstone& d)
                 {
-                    return d.shape.getPosition().y > 700;
+                    return d.shape.getPosition().y > 500.f;
                 }),
             dripstones.end());
     }

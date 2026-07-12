@@ -1,3 +1,7 @@
+// Monk.hpp - Boss enemy that fires homing spells at the player
+// The monk floats at a fixed position and periodically casts
+// one of three spell types (triangle, rectangle, circle) aimed at the hero.
+
 #pragma once
 
 #include <SFML/Graphics.hpp>
@@ -17,13 +21,13 @@ public:
 class Monk
 {
 private:
-    sf::CircleShape body; // simple stand-in sprite for the monk himself
+    sf::CircleShape body;
     std::vector<Spell> spells;
 
     sf::Vector2f position;
 
     float spawnTimer = 0.f;
-    float spawnInterval =0.7f; // seconds between casts
+    float spawnInterval =0.7f;
     float spellSpeed = 400.f;
 
 public:
@@ -92,7 +96,7 @@ private:
 
     void spawnSpell(sf::Vector2f target)
     {
-        int type = rand() % 3; // 0 = triangle, 1 = rectangle, 2 = circle
+        int type = rand() % 3;
 
         Spell s;
 

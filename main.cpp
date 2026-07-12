@@ -1,3 +1,7 @@
+// main.cpp - Entry point for the platformer demo
+// Sets up the game window, player, orb, fireballs, dripstones, and monk.
+// Handles input, physics, collision, and rendering each frame.
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <cmath>
@@ -23,11 +27,11 @@ int main()
     sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "Platform - Orb Fireball Demo");
     window.setFramerateLimit(60);
 
-    sf::RectangleShape ground({ 800.f, 50.f });//ground ko lagi
+    sf::RectangleShape ground({ 800.f, 50.f });
     ground.setPosition({ 0.f, 550.f });
     ground.setFillColor(sf::Color(100, 100, 100, 50));
 
-    sf::RectangleShape player({ 40.f, 60.f });//rect for now(gonna make it movable character arko pali)
+    sf::RectangleShape player({ 40.f, 60.f });
     player.setFillColor(sf::Color::Green);
     player.setPosition({ 380.f, 490.f });
 
@@ -37,16 +41,15 @@ int main()
     float jumpStrength = -450.f;
     bool onGround = true;
 
-    sf::CircleShape orb(20.f);//magical orb
+    sf::CircleShape orb(20.f);
     orb.setFillColor(sf::Color::Yellow);
     orb.setOrigin({ 20.f, 20.f });
     orb.setPosition({ 400.f, 100.f });
 
-    // Fireballs
     std::vector<Fireball> fireballs;
     float fireballSpeed = 250.f;
     float spawnTimer = 0.f;
-    float spawnInterval = 0.1f;//frequency
+    float spawnInterval = 0.1f;
 
     DripstoneManager dm;
     Monk monk({ 600.f, 200.f });
@@ -89,22 +92,21 @@ int main()
             {
                 pos.x += playerSpeed * dt;
             }
-            if (pos.x < 0)//limiting inside window
+            if (pos.x < 0)
                 pos.x = 0;
 
             if (pos.x > 760)
                 pos.x = 760;
             if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
                 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) &&
-                onGround)//both key support garxa
+                onGround)
             {
                 velocityY = jumpStrength;
                 onGround = false;
             }
-            velocityY += gravity * dt;//accelerating
+            velocityY += gravity * dt;
             pos.y += velocityY * dt;
 
-            // Ground collision
             if (pos.y >= 490)
             {
                 pos.y = 490;
@@ -113,7 +115,7 @@ int main()
             }
             player.setPosition(pos);
 
-            spawnTimer += dt;//fireball spawn garne
+            spawnTimer += dt;
 
             if (spawnTimer >= spawnInterval)
             {
@@ -138,12 +140,12 @@ int main()
 
                 fireballs.push_back(fb);
             }
-            for (auto& fb : fireballs)//fireball movememnt
+            for (auto& fb : fireballs)
             {
                 fb.shape.move(fb.velocity * dt);
             }
 
-            fireballs.erase(//boundary for fireballs
+            fireballs.erase(
                 std::remove_if(
                     fireballs.begin(),
                     fireballs.end(),
@@ -160,7 +162,7 @@ int main()
 
             dm.update(dt);
             monk.update(dt, player.getPosition());
-            auto playerBounds = player.getGlobalBounds();//collision detect
+            auto playerBounds = player.getGlobalBounds();
 
             for (auto& fb : fireballs)
             {
@@ -183,7 +185,7 @@ int main()
         else
         {
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))//RESTART
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
             {
                 gameOver = false;
 
@@ -201,7 +203,7 @@ int main()
         }
 
 
-        window.clear(sf::Color(30, 30, 40));//DRAW
+        window.clear(sf::Color(30, 30, 40));
 
         window.draw(ground);
         window.draw(orb);

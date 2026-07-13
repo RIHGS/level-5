@@ -1,7 +1,3 @@
-// main.cpp - Entry point for the platformer demo
-// Sets up the game window, player, orb, fireballs, dripstones, and monk.
-// Handles input, physics, collision, and rendering each frame.
-
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <cmath>
@@ -10,8 +6,6 @@
 #include <algorithm>
 #include <optional>
 #include<iostream>
-#include "dripstone.h"
-#include"Monk.hpp"
 
 class Fireball
 {
@@ -22,16 +16,15 @@ public:
 
 int main()
 {
-
     srand(static_cast<unsigned>(time(nullptr)));
     sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "Platform - Orb Fireball Demo");
     window.setFramerateLimit(60);
 
-    sf::RectangleShape ground({ 800.f, 50.f });
+    sf::RectangleShape ground({ 800.f, 50.f });//ground ko lagi
     ground.setPosition({ 0.f, 550.f });
-    ground.setFillColor(sf::Color(100, 100, 100, 50));
+    ground.setFillColor(sf::Color(100, 100, 100,50));
 
-    sf::RectangleShape player({ 40.f, 60.f });
+    sf::RectangleShape player({ 40.f, 60.f });//rect for now(gonna make it movable character arko pali)
     player.setFillColor(sf::Color::Green);
     player.setPosition({ 380.f, 490.f });
 
@@ -41,34 +34,37 @@ int main()
     float jumpStrength = -450.f;
     bool onGround = true;
 
-    sf::CircleShape orb(20.f);
+    sf::CircleShape orb(20.f);//magical orb
     orb.setFillColor(sf::Color::Yellow);
     orb.setOrigin({ 20.f, 20.f });
     orb.setPosition({ 400.f, 100.f });
 
+    // Fireballs
     std::vector<Fireball> fireballs;
+
     float fireballSpeed = 250.f;
     float spawnTimer = 0.f;
-    float spawnInterval = 0.1f;
+    float spawnInterval = 0.1f;//frequency
 
-    DripstoneManager dm;
-    Monk monk({ 600.f, 200.f });
     bool gameOver = false;
+
+    
     sf::Font font;
-    bool fontLoaded = font.openFromFile("Data/Roboto-Medium.ttf");
+    bool fontLoaded = font.openFromFile("C:/Windows/Fonts/arial.ttf");
 
     sf::Text gameOverText(font);
 
     if (fontLoaded)
     {
         gameOverText.setString("GAME OVER - Press R to Restart");
-        gameOverText.setCharacterSize(36);
+        gameOverText.setCharacterSize(28);
         gameOverText.setFillColor(sf::Color::Red);
-        gameOverText.setPosition({ 150.f, 50.f });
+        gameOverText.setPosition({ 120.f, 280.f });
     }
+
     sf::Clock clock;
-    while (window.isOpen())
-    {
+     while (window.isOpen())
+      {
         float dt = clock.restart().asSeconds();
         while (const std::optional event = window.pollEvent())
         {
@@ -77,6 +73,7 @@ int main()
                 window.close();
             }
         }
+
         if (!gameOver)
         {
             sf::Vector2f pos = player.getPosition();
@@ -92,30 +89,32 @@ int main()
             {
                 pos.x += playerSpeed * dt;
             }
-            if (pos.x < 0)
+            if (pos.x < 0)//limiting inside window
                 pos.x = 0;
 
             if (pos.x > 760)
                 pos.x = 760;
-            if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
+            if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) ||
                 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) &&
-                onGround)
+                onGround)//both key support garxa
             {
                 velocityY = jumpStrength;
                 onGround = false;
-            }
-            velocityY += gravity * dt;
+            }   
+            velocityY += gravity * dt;//accelerating
             pos.y += velocityY * dt;
 
+            // Ground collision
             if (pos.y >= 490)
             {
                 pos.y = 490;
                 velocityY = 0;
                 onGround = true;
             }
+
             player.setPosition(pos);
 
-            spawnTimer += dt;
+            spawnTimer += dt;//fireball spawn garne
 
             if (spawnTimer >= spawnInterval)
             {
@@ -140,12 +139,12 @@ int main()
 
                 fireballs.push_back(fb);
             }
-            for (auto& fb : fireballs)
+               for (auto& fb : fireballs)//fireball movememnt
             {
                 fb.shape.move(fb.velocity * dt);
             }
-
-            fireballs.erase(
+            
+            fireballs.erase(//boundary for fireballs
                 std::remove_if(
                     fireballs.begin(),
                     fireballs.end(),
@@ -156,13 +155,12 @@ int main()
                         return p.x < -50 ||
                             p.x > 850 ||
                             p.y < -50 ||
-                            p.y > 550.f;
+                            p.y > 650;
                     }),
                 fireballs.end());
 
-            dm.update(dt);
-            monk.update(dt, player.getPosition());
-            auto playerBounds = player.getGlobalBounds();
+
+            auto playerBounds = player.getGlobalBounds();//collision detect
 
             for (auto& fb : fireballs)
             {
@@ -171,21 +169,12 @@ int main()
                     gameOver = true;
                     break;
                 }
-                if (dm.checkCollision(playerBounds))
-                {
-                    gameOver = true;
-                }
-                if (monk.checkCollision(playerBounds))
-                {
-                    gameOver = true;
-                }
             }
-
         }
         else
         {
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
+         
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))//RESTART
             {
                 gameOver = false;
 
@@ -197,19 +186,14 @@ int main()
                 fireballs.clear();
 
                 spawnTimer = 0.f;
-                dm.reset();
-                monk.reset();
             }
         }
 
-
-        window.clear(sf::Color(30, 30, 40));
+        window.clear(sf::Color(30, 30, 40));//DRAW
 
         window.draw(ground);
         window.draw(orb);
         window.draw(player);
-        dm.draw(window);
-        monk.draw(window);
 
         for (auto& fb : fireballs)
         {
@@ -222,7 +206,6 @@ int main()
         }
 
         window.display();
-
     }
 
     return 0;
